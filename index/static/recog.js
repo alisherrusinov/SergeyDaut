@@ -27,6 +27,9 @@ recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
   if (result.isFinal) {
     console.log('Вы сказали: ' + result[0].transcript);
+    if(result[0].transcript.includes('Assistant')){
+      console.log('Я слушаю')
+    }
 
   } else {
     console.log('Промежуточный результат: ', result[0].transcript);

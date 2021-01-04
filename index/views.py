@@ -17,14 +17,14 @@ def get_voice(request):
             for chunk in request.FILES['voice'].chunks():
                 destination.write(chunk)
         return HttpResponse('ok')
-
+@csrf_exempt
 def text_to_speech(request):
     if(request.method == 'POST'):
-        text = request.POST.get('word')
+        text = request.POST.get('text')
         print(text)
         tts = gTTS(text)
         tts.save(os.path.join(settings.MEDIA_ROOT, f'{text}.mp3'))
-        return render(request, 'index/tts.html', {'speech':f'{text}.mp3'})
+        return HttpResponse(f'{text}.mp3')
     else:
         return render(request, 'index/tts.html')
 

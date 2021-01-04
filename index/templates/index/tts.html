@@ -1,17 +1,28 @@
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>TestTTS</title>
+    <script src="{%static 'tts.js'%}"></script>
 </head>
 <body>
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="word" id="">
-        <button type="submit">Ттс</button>
+        <input type="text" name="word" id="word">
+        <button onclick="tts()">Ттс</button>
     </form>
     {% if speech %}
-    <script>new Audio('{{speech}}').play()</script>
+    <script>new Audio('{{speech}}').play()
+    </script>
+    
     {% endif %}
+    <p>Текст для озвучки:</p>
+    <p>
+      <textarea id="message">Привет! С вами «интерфейсы без шелухи» — заметки о продуктоводстве, интерфейсах, здравом смысле и разработке софта</textarea>
+    </p>
+    <button id="speak" onclick="speak()">Озвучить</button>
+<script
+  src="https://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"></script>
 </body>
 </html>
