@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TestTTS</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="word" id="">
+        <button type="submit">Ттс</button>
+    </form>
+    {% if speech %}
+    <script>new Audio('{{speech}}').play()</script>
+    {% endif %}
+</body>
+</html>
