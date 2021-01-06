@@ -22,7 +22,7 @@ recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
   if (result.isFinal) {
     console.log('Вы сказали: ' + result[0].transcript);
-    if (result[0].transcript.includes('Assistant')) {
+    if (result[0].transcript.includes('Assistant') || result[0].transcript.includes('System') || result[0].transcript.includes('system')) {
       console.log('Я слушаю');
       start_custom_listen();
     }
@@ -31,7 +31,6 @@ recognition.onresult = function (event) {
     console.log('Промежуточный результат: ', result[0].transcript);
   }
 };
-
 
 
 function start_custom_listen() {
@@ -48,7 +47,8 @@ function start_custom_listen() {
 
       mediaRecorder.addEventListener("stop", function () {
         const audioBlob = new Blob(audioChunks, {
-          type: 'audio/wav'
+          type: 'audio/wav',
+          codecs: 'PCMA'
         });
 
         let fd = new FormData();
@@ -65,12 +65,14 @@ function start_custom_listen() {
     });
 }
 
-function start_recognition(){
+
+function start_recognition() {
   recognition.onend = function () {
     recognition.start();
   };
   recognition.start();
 }
+
 
 async function sendVoice(form) {
   const URL = 'voice';
@@ -80,14 +82,10 @@ async function sendVoice(form) {
   });
   if (promise.ok) {
     let response = await promise.json();
-    console.log(response.data);
-    let audio = document.createElement('audio');
-    audio.src = response.data;
-    audio.controls = true;
-    audio.autoplay = true;
-    document.querySelector('#messages').appendChild(audio);
+    console.log(response.text);
+
   }
 }
 
 // Начинаем слушать микрофон и распознавать голос
-start_recognition();
+start_recognition()

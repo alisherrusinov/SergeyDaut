@@ -1,6 +1,4 @@
-function tts() {
-    text = document.getElementById('word').value
-    alert(text)
+function tts(text) {
     $.ajax({
         url: '/tts',
         /* Куда пойдет запрос */
@@ -17,11 +15,3 @@ function tts() {
     });
 }
 
-function speak(text) {
-    const message = new SpeechSynthesisUtterance();
-    txtMessage = document.getElementById('message').value
-    message.lang = "en-US";
-    message.text = txtMessage;
-    window.speechSynthesis.speak(message);
-}
-speechSynthesis.speak(new SpeechSynthesisUtterance('Hello World'));
