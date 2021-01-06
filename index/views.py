@@ -8,6 +8,7 @@ import os
 def index(request):
     return render(request, 'index/index.html')
 
+
 @csrf_exempt
 def get_voice(request):
     if(request.method == 'POST'):
@@ -17,6 +18,8 @@ def get_voice(request):
             for chunk in request.FILES['voice'].chunks():
                 destination.write(chunk)
         return HttpResponse('ok')
+
+
 @csrf_exempt
 def text_to_speech(request):
     if(request.method == 'POST'):
@@ -27,4 +30,7 @@ def text_to_speech(request):
         return HttpResponse(f'{text}.mp3')
     else:
         return render(request, 'index/tts.html')
+
+def custom_recog(request):
+    return render(request, 'index/custom.html')
 

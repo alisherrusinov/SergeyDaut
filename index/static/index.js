@@ -16,6 +16,7 @@ navigator.mediaDevices.getUserMedia({ audio: true})
 
         document.querySelector('#start').addEventListener('click', function(){
             mediaRecorder.start();
+            console.log(mediaRecorder.audioBitsPerSecond);
         });
         let audioChunks = [];
         mediaRecorder.addEventListener("dataavailable",function(event) {
@@ -25,7 +26,7 @@ navigator.mediaDevices.getUserMedia({ audio: true})
         document.querySelector('#stop').addEventListener('click', function(){
             mediaRecorder.stop();
         });
-
+        
         mediaRecorder.addEventListener("stop", function() {
             const audioBlob = new Blob(audioChunks, {
                 type: 'audio/wav'
@@ -36,6 +37,7 @@ navigator.mediaDevices.getUserMedia({ audio: true})
             sendVoice(fd);
             audioChunks = [];
         });
+        
     });
 
 async function sendVoice(form) {
