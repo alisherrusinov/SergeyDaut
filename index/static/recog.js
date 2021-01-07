@@ -83,9 +83,32 @@ async function sendVoice(form) {
   if (promise.ok) {
     let response = await promise.json();
     console.log(response.text);
+    work(response.text.toLowerCase())
+  }
 
+}
+
+
+TIME_VARIANTS = ['time is it now', 'time is now']
+
+function contains(text, variants) {
+  status = false
+  variants.forEach(function (item, i, variants) {
+    if (text.includes(item)) {
+      status = 'ok'
+    }
+  });
+  return status
+}
+
+
+function work(text) {
+  alert(contains(text, TIME_VARIANTS))
+  if (contains(text, TIME_VARIANTS) == 'ok') {
+    tts('15:06')
   }
 }
+
 
 // Начинаем слушать микрофон и распознавать голос
 start_recognition()
