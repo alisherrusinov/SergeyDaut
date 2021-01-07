@@ -7,8 +7,8 @@
     <script src="{%static 'tts.js'%}"></script>
 </head>
 <body>
-        <input type="text" name="word" id="word">
-        <button onclick="tts()">Ттс</button>
+        <input type="text" name="text" id="text">
+        <button onclick="tts(document.getElementById('text').value)">Ттс</button>
     </form>
     {% if speech %}
     <script>new Audio('{{speech}}').play()

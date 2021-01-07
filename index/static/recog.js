@@ -89,7 +89,6 @@ async function sendVoice(form) {
 }
 
 
-TIME_VARIANTS = ['time is it now', 'time is now']
 
 function contains(text, variants) {
   status = false
@@ -101,11 +100,29 @@ function contains(text, variants) {
   return status
 }
 
+TIME_VARIANTS = ['time is it now', 'time is now']
+
+DAY_OF_THE_WEEK_VARIANTS = ['day of the week', ]
 
 function work(text) {
-  alert(contains(text, TIME_VARIANTS))
   if (contains(text, TIME_VARIANTS) == 'ok') {
-    tts('15:06')
+    $.ajax({
+      url: 'current_time',
+      method: 'get',
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.time) /* В переменной data содержится ответ от index.php. */
+      }
+    })
+  } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
+    $.ajax({
+      url: 'current_day',
+      method: 'get',
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.day) /* В переменной data содержится ответ от index.php. */
+      }
+    })
   }
 }
 

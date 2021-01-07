@@ -3,9 +3,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from gtts import gTTS
-from .converters import speech_to_text
 import os
-import json
+from .converters import speech_to_text
+from .functions import current_time, day_of_the_week, current_date
 
 # Create your views here.
 
@@ -44,9 +44,21 @@ def text_to_speech(request):
         tts = gTTS(text)
         tts.save(os.path.join(settings.MEDIA_ROOT, f'{text[:10]}.mp3'))
         return HttpResponse(f'{text[:10]}.mp3')
-    else: # TODO: На дебаге убрать нужно это
+    else: # TODO: На продакшене убрать нужно это
         return render(request, 'index/tts.html')
 
-def custom_recog(request):
+
+def custom_recog(request):# TODO: На продакшене убрать нужно это
     return render(request, 'index/custom.html')
 
+
+def current_date_view(request):
+    return JsonResponse(dict(date=current_date()))
+
+
+def current_time_view(request):
+    return JsonResponse(dict(time=current_time()))
+
+
+def day_of_the_week_view(request):
+    return JsonResponse(dict(day=day_of_the_week()))
