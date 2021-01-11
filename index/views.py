@@ -53,12 +53,12 @@ def custom_recog(request):# TODO: На продакшене убрать нуж�
 
 
 def current_date_view(request):
-    return JsonResponse(dict(date=current_date()))
+    return JsonResponse(dict(data=current_date()))
 
 
 def current_time_view(request):
-    return JsonResponse(dict(time=current_time()))
+    return JsonResponse(dict(data=current_time()))
 
 
 def day_of_the_week_view(request):
-    return JsonResponse(dict(day=day_of_the_week()))
+    return JsonResponse(dict(data=day_of_the_week()))

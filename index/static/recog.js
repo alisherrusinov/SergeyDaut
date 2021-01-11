@@ -22,13 +22,13 @@ recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
   if (result.isFinal) {
     console.log('Вы сказали: ' + result[0].transcript);
-    if (result[0].transcript.includes('Assistant') || result[0].transcript.includes('System') || result[0].transcript.includes('system')) {
-      console.log('Я слушаю');
-      start_custom_listen();
+    text = result[0].transcript
+    text = text.toLowerCase()
+    if (text.includes('assistant') || text.includes('system')) {
+      setTimeout(() => start_custom_listen(), 500);
+      tts("I'm listening")
     }
 
-  } else {
-    console.log('Промежуточный результат: ', result[0].transcript);
   }
 };
 
@@ -111,7 +111,7 @@ function work(text) {
       method: 'get',
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.time) /* В переменной data содержится ответ от index.php. */
+        tts(data.data) /* В переменной data содержится ответ от index.php. */
       }
     })
   } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
@@ -120,7 +120,7 @@ function work(text) {
       method: 'get',
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.day) /* В переменной data содержится ответ от index.php. */
+        tts(data.data)
       }
     })
   }
