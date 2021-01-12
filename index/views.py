@@ -47,6 +47,13 @@ def text_to_speech(request):
     else: # TODO: На продакшене убрать нужно это
         return render(request, 'index/tts.html')
 
+@csrf_exempt
+def remove_temp(request):
+    if (request.method == 'POST'):
+        text = request.POST.get('text')
+        print(f"rm {os.path.join(settings.MEDIA_ROOT, text)}")
+        os.popen(f'rm {settings.MEDIA_ROOT}/"{text[:10]}.mp3"')
+        return HttpResponse('ok')
 
 def custom_recog(request):# TODO: На продакшене убрать нужно это
     return render(request, 'index/custom.html')

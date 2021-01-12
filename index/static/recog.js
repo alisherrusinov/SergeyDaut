@@ -17,6 +17,8 @@ recognition.maxAlternatives = 1;
 // Какой язык будем распознавать?
 recognition.lang = 'en-US';
 
+ACTIVATION_PHASES = ['system', 'assistant']
+
 // Используем колбек для обработки результатов
 recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
@@ -24,9 +26,9 @@ recognition.onresult = function (event) {
     console.log('Вы сказали: ' + result[0].transcript);
     text = result[0].transcript
     text = text.toLowerCase()
-    if (text.includes('assistant') || text.includes('system')) {
+    if (contains(text, ACTIVATION_PHASES) == 'ok') {
       setTimeout(() => start_custom_listen(), 500);
-      tts("I'm listening")
+      new Audio("templates/I'm listening.mp3").play()
     }
 
   }
@@ -100,9 +102,21 @@ function contains(text, variants) {
   return status
 }
 
+
+function delete_temp_tts(name){
+  $.ajax({
+    url: 'delete_temp',
+    method: 'post',
+    dataType: 'html',
+    data:{text:name}
+  })
+}
+
 TIME_VARIANTS = ['time is it now', 'time is now']
 
 DAY_OF_THE_WEEK_VARIANTS = ['day of the week', ]
+
+DATE_VARIANTS = ['what date is it today']
 
 function work(text) {
   if (contains(text, TIME_VARIANTS) == 'ok') {
@@ -124,6 +138,18 @@ function work(text) {
       }
     })
   }
+  else if (contains(text, DATE_VARIANTS) == 'ok') {
+    $.ajax({
+      url: 'current_date',
+      method: 'get',
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.data)
+        setTimeout(() => delete_temp_tts(data.data), 5000);
+      }
+    })
+  }
+
 }
 
 
