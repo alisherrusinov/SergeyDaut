@@ -13,6 +13,7 @@ from .functions import current_time, day_of_the_week, current_date, get_temperat
 def index(request):
     return render(request, 'index/index.html')
 
+
 @csrf_exempt
 def recognise_speech(request):
     """
@@ -28,6 +29,9 @@ def recognise_speech(request):
             for chunk in request.FILES['voice'].chunks():
                 destination.write(chunk)
         text = speech_to_text(temp_path)
+
+        os.popen(f'rm {temp_path}')
+
         print(text['text'])
         return JsonResponse(dict(text=text['text']))
 
@@ -47,6 +51,7 @@ def text_to_speech(request):
         return HttpResponse(f'{text[:10]}.mp3')
     else: # TODO: На продакшене убрать нужно это
         return render(request, 'index/tts.html')
+
 
 @csrf_exempt
 def remove_temp(request):
