@@ -119,6 +119,8 @@ DAY_OF_THE_WEEK_VARIANTS = ['day of the week', ]
 
 DATE_VARIANTS = ['what date is it today']
 
+WEATHER_TEMPERATURE_VARIANTS = ["what's the temperature in",]
+
 WEATHER_VARIANTS = ["what's the weather in",]
 
 function work(text) {
@@ -154,12 +156,26 @@ function work(text) {
       }
     })
   }
+  else if (contains(text, WEATHER_TEMPERATURE_VARIANTS) == 'ok') {
+    $.ajax({
+      url: 'get_temperature',
+      method: 'post',
+      data: {
+        city: get_city_name(text, WEATHER_TEMPERATURE_VARIANTS) 
+      },
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.data)
+        setTimeout(() => delete_temp_tts(data.data), 5000);
+      }
+    })
+  }
   else if (contains(text, WEATHER_VARIANTS) == 'ok') {
     $.ajax({
       url: 'get_weather',
       method: 'post',
       data: {
-        city: get_city_name(text) 
+        city: get_city_name(text, WEATHER_VARIANTS) 
       },
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
@@ -171,8 +187,8 @@ function work(text) {
 
 }
 
-function get_city_name(text){
-  WEATHER_VARIANTS.forEach(function (item, i, WEATHER_VARIANTS) {
+function get_city_name(text, variants){
+  variants.forEach(function (item, i, variants) {
     if (text.includes(item)) {
       text = text.replace(item, '')
     }

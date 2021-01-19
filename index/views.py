@@ -5,7 +5,7 @@ from django.conf import settings
 from gtts import gTTS
 import os
 from .converters import speech_to_text
-from .functions import current_time, day_of_the_week, current_date, get_weather, get_description_weather
+from .functions import current_time, day_of_the_week, current_date, get_temperature, get_description_weather
 
 # Create your views here.
 
@@ -74,7 +74,22 @@ def day_of_the_week_view(request):
 
 @csrf_exempt
 def get_weather_view(request):
+    """
+    :param request:
+    :return: описание погоды в городе
+    """
     if(request.method == 'POST'):
         city = request.POST.get('city')
         print(city)
-        return JsonResponse(dict(data=get_weather(city)))
+        return JsonResponse(dict(data=get_description_weather(city)))
+
+@csrf_exempt
+def get_temperature_view(request):
+    """
+    :param request:
+    :return: температуру в городе
+    """
+    if(request.method == 'POST'):
+        city = request.POST.get('city')
+        print(city)
+        return JsonResponse(dict(data=get_temperature(city)))

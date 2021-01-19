@@ -98,7 +98,7 @@ def get_description_weather(city):
     return decsription
 
 
-def get_weather(city):
+def get_temperature(city):
     """
         Функция которая определяет температуру в городе
         :param city: Название города
