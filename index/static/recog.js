@@ -28,7 +28,7 @@ recognition.onresult = function (event) {
     text = text.toLowerCase()
     if (contains(text, ACTIVATION_PHASES) == 'ok') {
       setTimeout(() => start_custom_listen(), 500);
-      new Audio("templates/I'm listening.mp3").play()
+      new Audio("templates/hi1.mp3").play()
     }
 
   }
@@ -112,11 +112,14 @@ function delete_temp_tts(name){
   })
 }
 
+
 TIME_VARIANTS = ['time is it now', 'time is now']
 
 DAY_OF_THE_WEEK_VARIANTS = ['day of the week', ]
 
 DATE_VARIANTS = ['what date is it today']
+
+WEATHER_VARIANTS = ["what's the weather in",]
 
 function work(text) {
   if (contains(text, TIME_VARIANTS) == 'ok') {
@@ -125,7 +128,8 @@ function work(text) {
       method: 'get',
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data) /* В переменной data содержится ответ от index.php. */
+        tts(data.data) 
+        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
@@ -135,6 +139,7 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
+        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   }
@@ -149,9 +154,31 @@ function work(text) {
       }
     })
   }
+  else if (contains(text, WEATHER_VARIANTS) == 'ok') {
+    $.ajax({
+      url: 'get_weather',
+      method: 'post',
+      data: {
+        city: get_city_name(text) 
+      },
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.data)
+        setTimeout(() => delete_temp_tts(data.data), 5000);
+      }
+    })
+  }
 
 }
 
+function get_city_name(text){
+  WEATHER_VARIANTS.forEach(function (item, i, WEATHER_VARIANTS) {
+    if (text.includes(item)) {
+      text = text.replace(item, '')
+    }
+  });
+  return text
+}
 
 // Начинаем слушать микрофон и распознавать голос
 start_recognition()
