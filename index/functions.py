@@ -121,3 +121,23 @@ def get_temperature(city):
 
     return f'{date} in {name} {current_temp}'
 
+def get_news():
+    """Функция возвращающая два списка: заголовки новостей и ссылки на них"""
+    request = requests.get('https://www.bbc.com/news')
+
+    soup = BeautifulSoup(request.text, 'html.parser')
+
+    headers = soup.find_all('a', {'class': 'gs-c-promo-heading gs-o-faux-block-link__overlay-link gel-pica-bold nw-o-link-split__anchor'})
+
+    response = []
+    links = []
+
+    for header in headers:
+        response.append(header.text)
+        if("https" in header['href']):
+            links.append(f"{header['href']}")
+        else:
+            links.append(f"https://www.bbc.com/news{header['href']}")
+
+    return response, links
+

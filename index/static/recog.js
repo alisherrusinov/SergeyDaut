@@ -19,6 +19,8 @@ recognition.lang = 'en-US';
 
 ACTIVATION_PHASES = ['system', 'assistant']
 
+STOP_PHRASES = ['stop']
+
 // Используем колбек для обработки результатов
 recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
@@ -29,6 +31,12 @@ recognition.onresult = function (event) {
     if (contains(text, ACTIVATION_PHASES) == 'ok') {
       setTimeout(() => start_custom_listen(), 500);
       new Audio("templates/hi1.mp3").play()
+    }
+    else if(contains(text, STOP_PHRASES) == 'ok'){
+      if(IS_PLAYING_NEWS){
+        document.getElementById('news-speaker').pause()
+        IS_PLAYING_NEWS = false
+      }
     }
 
   }
@@ -123,6 +131,11 @@ WEATHER_TEMPERATURE_VARIANTS = ["what's the temperature in",]
 
 WEATHER_VARIANTS = ["what's the weather in",]
 
+NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'read the news for me']
+
+
+IS_PLAYING_NEWS = false
+
 function work(text) {
   if (contains(text, TIME_VARIANTS) == 'ok') {
     $.ajax({
@@ -130,7 +143,7 @@ function work(text) {
       method: 'get',
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data) 
+        tts(data.data)
         setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
@@ -181,6 +194,16 @@ function work(text) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
         setTimeout(() => delete_temp_tts(data.data), 5000);
+      }
+    })
+  }
+  else if (contains(text, NEWS_VARIANTS) == 'ok') {
+    $.ajax({
+      url: 'get_news',
+      method: 'get',
+      success: function (data) {
+        /* функция которая будет выполнена после успешного запроса.  */
+        tts(data.data, speaker='News')
       }
     })
   }
