@@ -101,9 +101,14 @@ def speech_to_text(path: str = None,
 
         return dict(error=error_message)
 
-    text_sphinx = recognizer.recognize_google(_audio)
+    try:
+        text_sphinx = recognizer.recognize_google(_audio)
 
-    return dict(
-        text=text_sphinx,
-        error=error_message
-    )
+        return dict(
+            text=text_sphinx,
+            error=error_message
+        )
+    except speech_recognition.UnknownValueError:
+        return dict(
+            text='Unkown'
+        )

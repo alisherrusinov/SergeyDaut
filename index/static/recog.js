@@ -133,6 +133,9 @@ WEATHER_VARIANTS = ["what's the weather in",]
 
 NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'read the news for me']
 
+TIMER_VARIANTS = ['set timer for',]
+
+ALARM_VARIANTS = ['set alarm for', 'set  alarm at']
 
 IS_PLAYING_NEWS = false
 
@@ -207,8 +210,40 @@ function work(text) {
       }
     })
   }
+  else if (contains(text, TIMER_VARIANTS) == 'ok') {
+    TIMER_VARIANTS.forEach(function (item, i, TIMER_VARIANTS) {
+      if (text.includes(item)) {
+        text = text.replace(item, '')
+      }
+    });
 
+    console.log(text)
+
+    if(text.includes('minute')){
+      text = text.replace('minutes','')
+      text = text.replace('minute','')
+      delay = Number(text)*60
+    }
+    
+    else if(text.includes('seconds')){
+      text = text.replace('seconds','')
+      delay = Number(text)
+    }
+    else if(text.includes('hour')){
+      text = text.replace('hours','')
+      text = text.replace('hour','')
+      delay = Number(text)*3600
+    }
+    console.log(delay)
+
+  }
+  setTimeout(() => alarm(), delay*1000);
 }
+
+function alarm(){
+  new Audio('templates/alarm.mp3').play()
+}
+
 
 function get_city_name(text, variants){
   variants.forEach(function (item, i, variants) {

@@ -49,8 +49,6 @@ def text_to_speech(request):
         tts = gTTS(text)
         tts.save(os.path.join(settings.MEDIA_ROOT, f'{text[:10]}.mp3'))
         return HttpResponse(f'{text[:10]}.mp3')
-    else: # TODO: На продакшене убрать нужно это
-        return render(request, 'index/tts.html')
 
 
 @csrf_exempt
@@ -60,9 +58,6 @@ def remove_temp(request):
         print(f"rm {os.path.join(settings.MEDIA_ROOT, text)}")
         os.popen(f'rm {settings.MEDIA_ROOT}/"{text[:10]}.mp3"')
         return HttpResponse('ok')
-
-def custom_recog(request):# TODO: На продакшене убрать нужно это
-    return render(request, 'index/custom.html')
 
 
 def current_date_view(request):
@@ -80,7 +75,7 @@ def day_of_the_week_view(request):
 @csrf_exempt
 def get_weather_view(request):
     """
-    :param request:
+    :param request: пост запрос с переменной city - название города
     :return: описание погоды в городе
     """
     if(request.method == 'POST'):
@@ -92,7 +87,7 @@ def get_weather_view(request):
 @csrf_exempt
 def get_temperature_view(request):
     """
-    :param request:
+    :param request: пост запрос с переменной city - название города
     :return: температуру в городе
     """
     if(request.method == 'POST'):
@@ -105,7 +100,7 @@ def get_temperature_view(request):
 def get_news_view(request):
     """
     :param request:
-    :return: температуру в городе
+    :return: Список первых десяти новостей
     """
     response, ids = get_news()
 
