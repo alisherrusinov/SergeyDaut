@@ -42,7 +42,7 @@ def text_to_speech(request):
         Функция которая синтезирует речь
         Приходят строки через POST запрос.
         Возвращается название файла в папке MEDIA.
-        """
+    """
     if(request.method == 'POST'):
         text = request.POST.get('text')
         print(text)

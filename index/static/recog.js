@@ -135,7 +135,13 @@ NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'rea
 
 TIMER_VARIANTS = ['set timer for',]
 
+CHANGE_TIMER_VARIANTS = ['change timer time to']
+
+CANCEL_TIMER_VARIANTS = ['remove timer']
+
 ALARM_VARIANTS = ['set alarm for', 'set  alarm at']
+
+REMINDER_VARIANTS = ['remind me to do']
 
 IS_PLAYING_NEWS = false
 
@@ -147,7 +153,6 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
-        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
@@ -157,7 +162,6 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
-        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   }
@@ -168,7 +172,6 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
-        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   }
@@ -182,7 +185,6 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
-        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   }
@@ -196,7 +198,6 @@ function work(text) {
       success: function (data) {
         /* функция которая будет выполнена после успешного запроса.  */
         tts(data.data)
-        setTimeout(() => delete_temp_tts(data.data), 5000);
       }
     })
   }
@@ -235,9 +236,58 @@ function work(text) {
       delay = Number(text)*3600
     }
     console.log(delay)
-
+    timer = setTimeout(() => alarm(), delay*1000);
+    timer_clearing = setTimeout(()=>timer = null, delay*1000);
   }
-  setTimeout(() => alarm(), delay*1000);
+  else if (contains(text, CHANGE_TIMER_VARIANTS) == 'ok') {
+    try{
+      if(timer){
+        CHANGE_TIMER_VARIANTS.forEach(function (item, i, CHANGE_TIMER_VARIANTS) {
+          if (text.includes(item)) {
+            text = text.replace(item, '')
+          }
+        });
+    
+        console.log(text)
+    
+        if(text.includes('minute')){
+          text = text.replace('minutes','')
+          text = text.replace('minute','')
+          delay = Number(text)*60
+        }
+        
+        else if(text.includes('seconds')){
+          text = text.replace('seconds','')
+          delay = Number(text)
+        }
+        else if(text.includes('hour')){
+          text = text.replace('hours','')
+          text = text.replace('hour','')
+          delay = Number(text)*3600
+        }
+        console.log(delay)
+        clearTimeout(timer)
+        timer = setTimeout(() => alarm(), delay*1000);
+        timer_clearing = setTimeout(()=>timer = null, delay*1000);
+      }
+      else{
+        console.log('Нету будильника')
+      }
+    }
+    catch(e){
+      console.log('Нету будильника')
+    }
+  }
+  else if (contains(text, CANCEL_TIMER_VARIANTS) == 'ok') {
+    try{
+      clearTimeout(timer)
+      timer = null
+      tts('Removed timer')
+    }
+    catch(e){
+      tts('There is no timers')
+    }
+  }
 }
 
 function alarm(){
