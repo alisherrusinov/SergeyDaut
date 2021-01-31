@@ -124,4 +124,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 PHRASES_ROOT = os.path.join(BASE_DIR, 'phrases')
 MEDIA_ROOT = os.path.join(BASE_DIR,'sounds', 'media')
+MUSIC_FILES = os.path.join(BASE_DIR, 'sounds', 'media', 'music')
 TEMP_FILES = os.path.join(BASE_DIR, 'sounds', 'temp')

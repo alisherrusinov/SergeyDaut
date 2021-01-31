@@ -5,7 +5,8 @@ from django.conf import settings
 from gtts import gTTS
 import os
 from .converters import speech_to_text
-from .functions import current_time, day_of_the_week, current_date, get_temperature, get_description_weather, get_news
+from .functions import current_time, day_of_the_week, current_date, get_temperature, get_description_weather, \
+    get_news, get_youtube_music
 
 # Create your views here.
 
@@ -71,7 +72,6 @@ def current_time_view(request):
 def day_of_the_week_view(request):
     return JsonResponse(dict(data=day_of_the_week()))
 
-
 @csrf_exempt
 def get_weather_view(request):
     """
@@ -109,3 +109,13 @@ def get_news_view(request):
     for i in response[:10]:
         answer+=f"{i}. "
     return JsonResponse(dict(data=answer))
+
+@csrf_exempt
+def get_music_view(request):
+    if (request.method == 'POST'):
+        query = request.POST.get('text')
+        print(query)
+
+        song_name = get_youtube_music(query)
+
+        return HttpResponse(song_name)

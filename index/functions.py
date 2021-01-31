@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup
+from youtube_search import YoutubeSearch
+import youtube_dl
 import requests
 import datetime
 import calendar
+from django.conf import settings
+import os
 
 
 def current_time():
@@ -140,4 +144,24 @@ def get_news():
             links.append(f"https://www.bbc.com/news{header['href']}")
 
     return response, links
+
+def get_youtube_music(query: str):
+    results = YoutubeSearch(query, max_results=5).to_dict() # Первые 5 видосов по запросу
+
+    first_song = results[0] # Первая песня (словарь там много ключей)
+    print(first_song)
+
+    ydl_opts = { # Настройки для скачивания
+        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
+        'outtmpl': settings.MUSIC_FILES +'/%(title)s.%(ext)s',
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([f"https://www.youtube.com/watch?v={first_song['id']}"])
+    directory = settings.MUSIC_FILES
+    file_name = f'{directory}/{first_song["title"]}.mp3' # Название файла которое получится после всех
+    # манипуляций
+    os.popen(f'mv "{file_name}" {directory}/{len(os.listdir(directory))+1}.mp3')
+    file_name = f"music/{len(os.listdir(directory))+1}.mp3"
+
+    return file_name
 
