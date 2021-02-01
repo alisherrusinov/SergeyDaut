@@ -151,17 +151,18 @@ def get_youtube_music(query: str):
     first_song = results[0] # Первая песня (словарь там много ключей)
     print(first_song)
 
+    directory = settings.MUSIC_FILES
+    file_name = f"{len(os.listdir(directory))+1}"
+
     ydl_opts = { # Настройки для скачивания
         'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
-        'outtmpl': settings.MUSIC_FILES +'/%(title)s.%(ext)s',
+        'outtmpl': settings.MUSIC_FILES +f'/{file_name}.%(ext)s',
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([f"https://www.youtube.com/watch?v={first_song['id']}"])
-    directory = settings.MUSIC_FILES
-    file_name = f'{directory}/{first_song["title"]}.mp3' # Название файла которое получится после всех
-    # манипуляций
-    os.popen(f'mv "{file_name}" {directory}/{len(os.listdir(directory))+1}.mp3')
-    file_name = f"music/{len(os.listdir(directory))+1}.mp3"
+
+
+    file_name = f"music/{file_name}.mp3"
 
     return file_name
 
