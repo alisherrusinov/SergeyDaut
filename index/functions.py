@@ -3,6 +3,7 @@ from youtube_search import YoutubeSearch
 import youtube_dl
 import requests
 import datetime
+import timestring
 import calendar
 from django.conf import settings
 import os
@@ -166,3 +167,9 @@ def get_youtube_music(query: str):
 
     return file_name
 
+
+def get_seconds_from_date(date: str):
+    future = timestring.Date(date).date
+    print(future)
+    delta = future - datetime.datetime.now()
+    return delta.days * 86400 + delta.seconds

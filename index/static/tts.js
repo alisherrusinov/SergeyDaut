@@ -31,7 +31,7 @@ function tts(text, speaker='None') {
                 document.getElementById('news-speaker').src=data; /* В переменной data содержится ответ от index.php. */
                 document.getElementById('news-speaker').play()
                 console.log('reading news')
-                IS_PLAYING_NEWS = true
+                CURRENT_STATE = 'PLAYING_NEWS'
                 setTimeout(() => delete_temp_tts(data), 20000);
             }
         });

@@ -6,7 +6,7 @@ from gtts import gTTS
 import os
 from .converters import speech_to_text
 from .functions import current_time, day_of_the_week, current_date, get_temperature, get_description_weather, \
-    get_news, get_youtube_music
+    get_news, get_youtube_music, get_seconds_from_date
 
 # Create your views here.
 
@@ -34,7 +34,7 @@ def recognise_speech(request):
         os.popen(f'rm {temp_path}')
 
         print(text['text'])
-        return JsonResponse(dict(text=text['text']))
+        return HttpResponse(text['text'])
 
 
 @csrf_exempt
@@ -62,7 +62,7 @@ def remove_temp(request):
 
 
 def current_date_view(request):
-    return JsonResponse(dict(data=current_date()))
+    return HttpResponse(current_date())
 
 
 def current_time_view(request):
@@ -119,3 +119,12 @@ def get_music_view(request):
         song_name = get_youtube_music(query)
 
         return HttpResponse(song_name)
+
+
+@csrf_exempt
+def get_timedelta_view(request):
+    if(request.method == 'POST'):
+        query = request.POST.get('text')
+        delta = get_seconds_from_date(query)
+
+        return HttpResponse(delta)

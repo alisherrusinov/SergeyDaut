@@ -21,6 +21,8 @@ ACTIVATION_PHASES = ['system', 'assistant']
 
 STOP_PHRASES = ['stop']
 
+CURRENT_STATE = 'IDLE' // PLAYING_NEWS PLAYING_MUSIC 
+
 // Используем колбек для обработки результатов
 recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
@@ -33,9 +35,13 @@ recognition.onresult = function (event) {
       new Audio("templates/hi1.mp3").play()
     }
     else if (contains(text, STOP_PHRASES) == 'ok') {
-      if (IS_PLAYING_NEWS) {
+      if (CURRENT_STATE == 'PLAYING_NEWS') {
         document.getElementById('news-speaker').pause()
-        IS_PLAYING_NEWS = false
+        CURRENT_STATE = 'IDLE'
+      }
+      else if (CURRENT_STATE == 'PLAYING_MUSIC') {
+        document.getElementById('music-speaker').pause()
+        CURRENT_STATE = 'IDLE'
       }
     }
 
@@ -91,9 +97,11 @@ async function sendVoice(form) {
     body: form
   });
   if (promise.ok) {
-    let response = await promise.json();
-    console.log(response.text);
-    work(response.text.toLowerCase())
+    let text;
+    let response = await promise.text();
+    text = response
+    console.log(text.toLowerCase())
+    work(text.toLowerCase())
   }
 
 }
@@ -121,7 +129,7 @@ function delete_temp_tts(name) {
 }
 
 
-TIME_VARIANTS = ['time is it now', 'time is now']
+TIME_VARIANTS = ['time is it now', 'time is now', 'what is the time now']
 
 DAY_OF_THE_WEEK_VARIANTS = ['day of the week',]
 
@@ -129,7 +137,7 @@ DATE_VARIANTS = ['what date is it today']
 
 WEATHER_TEMPERATURE_VARIANTS = ["what's the temperature in",]
 
-WEATHER_VARIANTS = ["what's the weather in",]
+WEATHER_VARIANTS = ["what's the weather in", "what is the weather like in", "what is the weather in"]
 
 NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'read the news for me']
 
@@ -141,159 +149,195 @@ CANCEL_TIMER_VARIANTS = ['remove timer']
 
 ALARM_VARIANTS = ['set alarm for', 'set  alarm at']
 
-REMINDER_VARIANTS = ['remind me to do']
+NOTIFICATION_ADDING_VARIANTS = ['new notification', 'add new notification', 'notification']
 
 MUSIC_PLAY_VARIANTS = ['play ']
 
-IS_PLAYING_NEWS = false
+
+notification_label = ''
+notification_date = ''
 
 function work(text) {
-  if (contains(text, TIME_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'current_time',
-      method: 'get',
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data)
-      }
-    })
-  } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'current_day',
-      method: 'get',
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data)
-      }
-    })
-  }
-  else if (contains(text, DATE_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'current_date',
-      method: 'get',
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data)
-      }
-    })
-  }
-  else if (contains(text, WEATHER_TEMPERATURE_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'get_temperature',
-      method: 'post',
-      data: {
-        city: get_city_name(text, WEATHER_TEMPERATURE_VARIANTS)
-      },
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data)
-      }
-    })
-  }
-  else if (contains(text, WEATHER_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'get_weather',
-      method: 'post',
-      data: {
-        city: get_city_name(text, WEATHER_VARIANTS)
-      },
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data)
-      }
-    })
-  }
-  else if (contains(text, NEWS_VARIANTS) == 'ok') {
-    $.ajax({
-      url: 'get_news',
-      method: 'get',
-      success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        tts(data.data, speaker = 'News')
-      }
-    })
-  }
-  else if (contains(text, TIMER_VARIANTS) == 'ok') {
-    TIMER_VARIANTS.forEach(function (item, i, TIMER_VARIANTS) {
-      if (text.includes(item)) {
-        text = text.replace(item, '')
-      }
-    });
-
-    console.log(text)
-
-    if (text.includes('minute')) {
-      text = text.replace('minutes', '')
-      text = text.replace('minute', '')
-      delay = Number(text) * 60
+  if (CURRENT_STATE == 'IDLE') {
+    if (contains(text, TIME_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'current_time',
+        method: 'get',
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data.data)
+        }
+      })
+    } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'current_day',
+        method: 'get',
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data.data)
+        }
+      })
     }
+    else if (contains(text, DATE_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'current_date',
+        method: 'get',
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data)
+        }
+      })
+    }
+    else if (contains(text, WEATHER_TEMPERATURE_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'get_temperature',
+        method: 'post',
+        data: {
+          city: get_city_name(text, WEATHER_TEMPERATURE_VARIANTS)
+        },
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data.data)
+        }
+      })
+    }
+    else if (contains(text, WEATHER_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'get_weather',
+        method: 'post',
+        data: {
+          city: get_city_name(text, WEATHER_VARIANTS)
+        },
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data.data)
+        }
+      })
+    }
+    else if (contains(text, NEWS_VARIANTS) == 'ok') {
+      $.ajax({
+        url: 'get_news',
+        method: 'get',
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          tts(data.data, speaker = 'News')
+        }
+      })
+    }
+    else if (contains(text, TIMER_VARIANTS) == 'ok') {
+      TIMER_VARIANTS.forEach(function (item, i, TIMER_VARIANTS) {
+        if (text.includes(item)) {
+          text = text.replace(item, '')
+        }
+      });
 
-    else if (text.includes('seconds')) {
-      text = text.replace('seconds', '')
-      delay = Number(text)
+      console.log(text)
+
+      if (text.includes('minute')) {
+        text = text.replace('minutes', '')
+        text = text.replace('minute', '')
+        delay = Number(text) * 60
+      }
+
+      else if (text.includes('seconds')) {
+        text = text.replace('seconds', '')
+        delay = Number(text)
+      }
+      else if (text.includes('hour')) {
+        text = text.replace('hours', '')
+        text = text.replace('hour', '')
+        delay = Number(text) * 3600
+      }
+      console.log(delay)
+      timer = setTimeout(() => alarm(), delay * 1000);
+      timer_clearing = setTimeout(() => timer = null, delay * 1000);
     }
-    else if (text.includes('hour')) {
-      text = text.replace('hours', '')
-      text = text.replace('hour', '')
-      delay = Number(text) * 3600
-    }
-    console.log(delay)
-    timer = setTimeout(() => alarm(), delay * 1000);
-    timer_clearing = setTimeout(() => timer = null, delay * 1000);
-  }
-  else if (contains(text, CHANGE_TIMER_VARIANTS) == 'ok') {
-    try {
-      if (timer) {
-        CHANGE_TIMER_VARIANTS.forEach(function (item, i, CHANGE_TIMER_VARIANTS) {
-          if (text.includes(item)) {
-            text = text.replace(item, '')
+    else if (contains(text, CHANGE_TIMER_VARIANTS) == 'ok') {
+      try {
+        if (timer) {
+          CHANGE_TIMER_VARIANTS.forEach(function (item, i, CHANGE_TIMER_VARIANTS) {
+            if (text.includes(item)) {
+              text = text.replace(item, '')
+            }
+          });
+
+          console.log(text)
+
+          if (text.includes('minute')) {
+            text = text.replace('minutes', '')
+            text = text.replace('minute', '')
+            delay = Number(text) * 60
           }
-        });
 
-        console.log(text)
-
-        if (text.includes('minute')) {
-          text = text.replace('minutes', '')
-          text = text.replace('minute', '')
-          delay = Number(text) * 60
+          else if (text.includes('seconds')) {
+            text = text.replace('seconds', '')
+            delay = Number(text)
+          }
+          else if (text.includes('hour')) {
+            text = text.replace('hours', '')
+            text = text.replace('hour', '')
+            delay = Number(text) * 3600
+          }
+          console.log(delay)
+          clearTimeout(timer)
+          timer = setTimeout(() => alarm(), delay * 1000);
+          timer_clearing = setTimeout(() => timer = null, delay * 1000);
         }
-
-        else if (text.includes('seconds')) {
-          text = text.replace('seconds', '')
-          delay = Number(text)
+        else {
+          console.log('Нету будильника')
         }
-        else if (text.includes('hour')) {
-          text = text.replace('hours', '')
-          text = text.replace('hour', '')
-          delay = Number(text) * 3600
-        }
-        console.log(delay)
-        clearTimeout(timer)
-        timer = setTimeout(() => alarm(), delay * 1000);
-        timer_clearing = setTimeout(() => timer = null, delay * 1000);
       }
-      else {
+      catch (e) {
         console.log('Нету будильника')
       }
     }
-    catch (e) {
-      console.log('Нету будильника')
+    else if (contains(text, CANCEL_TIMER_VARIANTS) == 'ok') {
+      try {
+        clearTimeout(timer)
+        timer = null
+        tts('Removed timer')
+      }
+      catch (e) {
+        tts('There is no timers')
+      }
+    }
+    else if (contains(text, MUSIC_PLAY_VARIANTS) == 'ok') {
+      text = text.replace('play ', "")
+      $.ajax({
+        url: '/play_music',
+        /* Куда пойдет запрос */
+        method: 'post',
+        /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
+        data: {
+          text: text
+        },
+        /* Параметры передаваемые в запросе. */
+        success: function (data) {
+          /* функция которая будет выполнена после успешного запроса.  */
+          document.getElementById('music-speaker').src = data; /* В переменной data содержится ответ от index.php. */
+          document.getElementById('music-speaker').play()
+          console.log('playing music')
+          CURRENT_STATE = 'PLAYING_MUSIC'
+        }
+      });
+    }
+    else if (contains(text, NOTIFICATION_ADDING_VARIANTS) == 'ok') {
+      tts('tell me what should I remind')
+      CURRENT_STATE = 'ADDING_NOTIFICATION'
+      start_custom_listen();
     }
   }
-  else if (contains(text, CANCEL_TIMER_VARIANTS) == 'ok') {
-    try {
-      clearTimeout(timer)
-      timer = null
-      tts('Removed timer')
-    }
-    catch (e) {
-      tts('There is no timers')
-    }
+  else if (CURRENT_STATE == 'ADDING_NOTIFICATION') {
+    notification_label = text
+    tts('tell me when should I remind')
+    CURRENT_STATE = 'ADDING_DATE_NOTIFICATION'
+    start_custom_listen()
   }
-  else if (contains(text, MUSIC_PLAY_VARIANTS) == 'ok') {
-    text = text.replace('play ', "")
+  else if (CURRENT_STATE == 'ADDING_DATE_NOTIFICATION') {
+    notification_date = text
+
     $.ajax({
-      url: '/play_music',
+      url: '/get_timedelta',
       /* Куда пойдет запрос */
       method: 'post',
       /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
@@ -302,15 +346,17 @@ function work(text) {
       },
       /* Параметры передаваемые в запросе. */
       success: function (data) {
-        /* функция которая будет выполнена после успешного запроса.  */
-        document.getElementById('music-speaker').src = data; /* В переменной data содержится ответ от index.php. */
-        document.getElementById('music-speaker').play()
-        console.log('playing music')
-        IS_PLAYING_NEWS = true
+        timer = setTimeout(function () {
+          tts(notification_label)
+          notification_date = ''
+          notification_label = ''
+        }, data * 1000);
       }
     });
-  }
 
+    console.log(notification_date, notification_label)
+    CURRENT_STATE = 'IDLE'
+  }
 }
 
 function alarm() {
