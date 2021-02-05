@@ -6,7 +6,8 @@ from gtts import gTTS
 import os
 from .converters import speech_to_text
 from .functions import current_time, day_of_the_week, current_date, get_temperature, get_description_weather, \
-    get_news, get_youtube_music, get_seconds_from_date
+    get_news, get_youtube_music, get_seconds_from_date, search_ebay, get_description_ebay
+
 
 # Create your views here.
 
@@ -22,9 +23,9 @@ def recognise_speech(request):
     Приходят blob файлы через POST запрос.
     Возвращается текст.
     """
-    if(request.method == 'POST'):
+    if (request.method == 'POST'):
         directory = settings.TEMP_FILES
-        filename = f'temp{len(os.listdir(directory))+1}.wav'
+        filename = f'temp{len(os.listdir(directory)) + 1}.wav'
         temp_path = os.path.join(directory, filename)
         with open(temp_path, 'wb+') as destination:
             for chunk in request.FILES['voice'].chunks():
@@ -44,12 +45,15 @@ def text_to_speech(request):
         Приходят строки через POST запрос.
         Возвращается название файла в папке MEDIA.
     """
-    if(request.method == 'POST'):
+    if (request.method == 'POST'):
         text = request.POST.get('text')
         print(text)
         tts = gTTS(text)
-        tts.save(os.path.join(settings.MEDIA_ROOT, f'{text[:10]}.mp3'))
-        return HttpResponse(f'{text[:10]}.mp3')
+        directory = settings.MEDIA_ROOT
+        response = f"{len(os.listdir(directory)) + 1}.mp3"
+        filename = os.path.join(settings.MEDIA_ROOT, response)
+        tts.save(filename)
+        return HttpResponse(response)
 
 
 @csrf_exempt
@@ -57,7 +61,8 @@ def remove_temp(request):
     if (request.method == 'POST'):
         text = request.POST.get('text')
         print(f"rm {os.path.join(settings.MEDIA_ROOT, text)}")
-        os.popen(f'rm {settings.MEDIA_ROOT}/"{text[:10]}.mp3"')
+        directory = settings.MEDIA_ROOT
+        os.popen(f'rm {settings.MEDIA_ROOT}/{text}')
         return HttpResponse('ok')
 
 
@@ -72,13 +77,14 @@ def current_time_view(request):
 def day_of_the_week_view(request):
     return JsonResponse(dict(data=day_of_the_week()))
 
+
 @csrf_exempt
 def get_weather_view(request):
     """
     :param request: пост запрос с переменной city - название города
     :return: описание погоды в городе
     """
-    if(request.method == 'POST'):
+    if (request.method == 'POST'):
         city = request.POST.get('city')
         print(city)
         return JsonResponse(dict(data=get_description_weather(city)))
@@ -90,7 +96,7 @@ def get_temperature_view(request):
     :param request: пост запрос с переменной city - название города
     :return: температуру в городе
     """
-    if(request.method == 'POST'):
+    if (request.method == 'POST'):
         city = request.POST.get('city')
         print(city)
         return JsonResponse(dict(data=get_temperature(city)))
@@ -107,8 +113,9 @@ def get_news_view(request):
     answer = ""
 
     for i in response[:10]:
-        answer+=f"{i}. "
+        answer += f"{i}. "
     return JsonResponse(dict(data=answer))
+
 
 @csrf_exempt
 def get_music_view(request):
@@ -123,8 +130,26 @@ def get_music_view(request):
 
 @csrf_exempt
 def get_timedelta_view(request):
-    if(request.method == 'POST'):
+    if (request.method == 'POST'):
         query = request.POST.get('text')
         delta = get_seconds_from_date(query)
 
         return HttpResponse(delta)
+
+
+@csrf_exempt
+def get_products_view(request):
+    if (request.method == 'POST'):
+        query = request.POST.get('text')
+        response, links, prices = search_ebay(query)
+
+        return JsonResponse(dict(data=response, links=links, prices=prices, ))
+
+
+@csrf_exempt
+def det_decs_view(request):
+    if (request.method == 'POST'):
+        query = request.POST.get('text')
+        response = get_description_ebay(query)
+
+        return HttpResponse(response)

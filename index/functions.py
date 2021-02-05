@@ -173,3 +173,56 @@ def get_seconds_from_date(date: str):
     print(future)
     delta = future - datetime.datetime.now()
     return delta.days * 86400 + delta.seconds
+
+
+def search_ebay(item: str):
+    """
+    Функция, которая ищет заголовки товара на ebay
+    :param item: Товар
+    :return: Список заголовков
+    """
+    URL = f"https://www.ebay.co.uk/sch/i.html?_nkw={item}"
+
+    print(URL)
+    request = requests.get(URL)
+    soup = BeautifulSoup(request.text, 'html.parser')
+
+    headers = soup.find_all('div', {
+        'class': 's-item__info clearfix'})
+
+    response = []
+    links = []
+    prices = []
+
+    for header in headers:
+        response.append(header.h3.text)
+        links.append(header.a['href'])
+        prices.append(header.find('span', {'class':'s-item__price'}).text)
+    return response, links, prices
+
+
+def get_description_ebay(url: str):
+    request = requests.get(url)
+
+    soup = BeautifulSoup(request.text, 'html.parser')
+
+    table = soup.find('div', {'class': 'itemAttr'})
+
+    labels = table.find_all('td', {'class': 'attrLabels'})[1:]
+    texts = table.find_all('td', {'width': '50.0%'})[1:]
+
+    print(labels[0].text)
+    print(texts[0].text)
+    response = ''
+    for i in range(len(labels)):
+        label = labels[i].text
+        label = label.replace('\n', '')
+        label = label.replace('\t', '')
+        response += label
+        text = texts[i].text
+        text = text.replace('\n', '')
+        text = text.replace('\t', '')
+        response += text
+        response += '.'
+    response = response[1:]
+    return response

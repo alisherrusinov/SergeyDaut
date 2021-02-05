@@ -3,7 +3,7 @@ from django.urls import path
 from .views import \
     index, recognise_speech, text_to_speech, \
     current_date_view, current_time_view, day_of_the_week_view, remove_temp, get_weather_view, get_temperature_view, \
-    get_news_view, get_music_view, get_timedelta_view
+    get_news_view, get_music_view, get_timedelta_view, get_products_view, det_decs_view
 
 urlpatterns = [
     path('', index),
@@ -17,5 +17,7 @@ urlpatterns = [
     path('get_weather', get_weather_view),
     path('get_news', get_news_view),
     path('play_music',  get_music_view),
-    path('get_timedelta', get_timedelta_view)
+    path('get_timedelta', get_timedelta_view),
+    path('get_products', get_products_view),
+    path('get_decs_ebay', det_decs_view),
 ]

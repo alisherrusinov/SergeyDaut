@@ -4,6 +4,8 @@ var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
 
 var grammar = '#JSGF V1.0;'
 
+voice = ''
+
 var recognition = new SpeechRecognition();
 var speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
@@ -22,6 +24,8 @@ ACTIVATION_PHASES = ['system', 'assistant']
 STOP_PHRASES = ['stop']
 
 CURRENT_STATE = 'IDLE' // PLAYING_NEWS PLAYING_MUSIC 
+
+PREVIOUS_STATE = ''
 
 // Используем колбек для обработки результатов
 recognition.onresult = function (event) {
@@ -42,6 +46,48 @@ recognition.onresult = function (event) {
       else if (CURRENT_STATE == 'PLAYING_MUSIC') {
         document.getElementById('music-speaker').pause()
         CURRENT_STATE = 'IDLE'
+      }
+      else if(CURRENT_STATE == 'SPEAKING'){
+        document.getElementById('speaker').pause()
+        CURRENT_STATE = PREVIOUS_STATE
+      }
+    }
+    else if(contains(text, NEXT_PRODUCT_VARIANTS) == 'ok'){
+      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+        // READ THE NEXT ONE
+        current_product+=1
+        tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
+        console.log(products_urls[current_product])
+      }
+    }
+    else if(contains(text, PREV_PRODUCT_VARIANTS) == 'ok'){
+      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+        // READ THE PREV ONE
+        if(current_product == 0){
+          tts("it's the first product")
+        }
+        else{
+        current_product-=1
+        tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
+        console.log(products_urls[current_product])
+        }
+      }
+    }
+    else if(contains(text, DESCRIPTION_VARIANTS) == 'ok'){
+      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+        $.ajax({
+          url: '/get_decs_ebay',
+          /* Куда пойдет запрос */
+          method: 'post',
+          /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
+          data: {
+              text: products_urls[current_product]
+          },
+          /* Параметры передаваемые в запросе. */
+          success: function (data) {
+              tts(data)
+          }
+      });
       }
     }
 
@@ -149,13 +195,28 @@ CANCEL_TIMER_VARIANTS = ['remove timer']
 
 ALARM_VARIANTS = ['set alarm for', 'set  alarm at']
 
-NOTIFICATION_ADDING_VARIANTS = ['new notification', 'add new notification', 'notification']
+NOTIFICATION_ADDING_VARIANTS = ['new notification', 'add new notification', 'notification', 'add new reminder']
 
 MUSIC_PLAY_VARIANTS = ['play ']
 
+EBAY_SEARCHING_VARIANTS = ['ebay']
 
+NEXT_PRODUCT_VARIANTS = ['next']
+
+PREV_PRODUCT_VARIANTS = ['go back']
+
+EXIT_EBAY_VARIANTS = ['exit from ebay']
+
+DESCRIPTION_VARIANTS = ['description', 'read the description']
+
+
+// Переменные которые нужны в глобальной видимости
 notification_label = ''
 notification_date = ''
+products = []
+products_urls = []
+products_prices = []
+current_product = 0
 
 function work(text) {
   if (CURRENT_STATE == 'IDLE') {
@@ -326,6 +387,34 @@ function work(text) {
       CURRENT_STATE = 'ADDING_NOTIFICATION'
       start_custom_listen();
     }
+    else if (contains(text, EBAY_SEARCHING_VARIANTS) == 'ok') {
+      text = text.replace('find me', '')
+      text = text.replace('on ebay', '')
+      text = text.replace('ebay', '')
+      console.log(text)
+
+      $.ajax({
+        url: '/get_products',
+        /* Куда пойдет запрос */
+        method: 'post',
+        /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
+        data: {
+          text: text
+        },
+        /* Параметры передаваемые в запросе. */
+        success: function (data) {
+          products = data.data
+          products_urls = data.links
+          products_prices = data.prices
+          console.log(products[current_product])
+          СURRENT_STATE = 'SEARCHING_PRODUCTS'
+          tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
+          console.log(products_urls[current_product])
+        }
+      });
+
+    }
+    
   }
   else if (CURRENT_STATE == 'ADDING_NOTIFICATION') {
     notification_label = text
@@ -356,6 +445,12 @@ function work(text) {
 
     console.log(notification_date, notification_label)
     CURRENT_STATE = 'IDLE'
+  }
+  else if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+    if(contains(text, EXIT_EBAY_VARIANTS) == 'ok'){
+      CURRENT_STATE = 'IDLE'
+      tts(text='Ok',speaker='None' ,previous_state='IDLE')
+    }
   }
 }
 

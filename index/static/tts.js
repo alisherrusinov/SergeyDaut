@@ -1,4 +1,4 @@
-function tts(text, speaker='None') {
+function tts(text, speaker='None', previous_state='IDLE') {
     if(speaker == 'None'){
         $.ajax({
             url: '/tts',
@@ -11,7 +11,15 @@ function tts(text, speaker='None') {
             /* Параметры передаваемые в запросе. */
             success: function (data) {
                 /* функция которая будет выполнена после успешного запроса.  */
-                new Audio(data).play() 
+                document.getElementById('speaker').src=data; /* В переменной data содержится ответ от index.php. */
+                document.getElementById('speaker').play()
+                console.log(previous_state)
+                PREVIOUS_STATE = previous_state
+                CURRENT_STATE = 'SPEAKING'
+                document.getElementById('speaker').onended = function() {
+                    console.log('ended');
+                    CURRENT_STATE = previous_state;
+                }
                 setTimeout(() => delete_temp_tts(data), 5000);
             }
         });
