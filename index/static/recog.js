@@ -64,7 +64,7 @@ recognition.onresult = function (event) {
       if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
         // READ THE PREV ONE
         if(current_product == 0){
-          tts("it's the first product")
+          tts(text="it's the first product",speaker='None' ,previous_state='SEARCHING_PRODUCTS')
         }
         else{
         current_product-=1
@@ -85,7 +85,7 @@ recognition.onresult = function (event) {
           },
           /* Параметры передаваемые в запросе. */
           success: function (data) {
-              tts(data)
+              tts(text=data,speaker='None' ,previous_state='SEARCHING_PRODUCTS')
           }
       });
       }
@@ -226,7 +226,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data.data)
+          tts(text=data.data,speaker='None' ,previous_state='IDLE')
         }
       })
     } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
@@ -235,7 +235,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data.data)
+          tts(text=data.data,speaker='None' ,previous_state='IDLE')
         }
       })
     }
@@ -245,7 +245,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data)
+          tts(text=data,speaker='None' ,previous_state='IDLE')
         }
       })
     }
@@ -258,7 +258,7 @@ function work(text) {
         },
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data.data)
+          tts(text=data.data,speaker='None' ,previous_state='IDLE')
         }
       })
     }
@@ -271,7 +271,7 @@ function work(text) {
         },
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data.data)
+          tts(text=data.data,speaker='None' ,previous_state='IDLE')
         }
       })
     }
@@ -281,7 +281,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(data.data, speaker = 'News')
+          tts(text=data.data, speaker = 'News',previous_state='IDLE')
         }
       })
     }
@@ -356,10 +356,10 @@ function work(text) {
       try {
         clearTimeout(timer)
         timer = null
-        tts('Removed timer')
+        tts(text='Removed timer',speaker='None' ,previous_state='IDLE')
       }
       catch (e) {
-        tts('There is no timers')
+        tts(text='There is no timers',speaker='None' ,previous_state='IDLE')
       }
     }
     else if (contains(text, MUSIC_PLAY_VARIANTS) == 'ok') {
@@ -383,7 +383,7 @@ function work(text) {
       });
     }
     else if (contains(text, NOTIFICATION_ADDING_VARIANTS) == 'ok') {
-      tts('tell me what should I remind')
+      tts(text='tell me what should I remind',speaker='None' ,previous_state='ADDING_NOTIFICATION')
       CURRENT_STATE = 'ADDING_NOTIFICATION'
       start_custom_listen();
     }
@@ -418,7 +418,7 @@ function work(text) {
   }
   else if (CURRENT_STATE == 'ADDING_NOTIFICATION') {
     notification_label = text
-    tts('tell me when should I remind')
+    tts(text='tell me when should I remind',speaker='None',previous_state='ADDING_DATE_NOTIFICATION')
     CURRENT_STATE = 'ADDING_DATE_NOTIFICATION'
     start_custom_listen()
   }
@@ -436,7 +436,7 @@ function work(text) {
       /* Параметры передаваемые в запросе. */
       success: function (data) {
         timer = setTimeout(function () {
-          tts(notification_label)
+          tts(text=notification_label,speaker='None' ,previous_state='IDLE')
           notification_date = ''
           notification_label = ''
         }, data * 1000);
@@ -450,6 +450,21 @@ function work(text) {
     if(contains(text, EXIT_EBAY_VARIANTS) == 'ok'){
       CURRENT_STATE = 'IDLE'
       tts(text='Ok',speaker='None' ,previous_state='IDLE')
+    }
+    else if(contains(text, DESCRIPTION_VARIANTS) == 'ok'){
+      $.ajax({
+        url: '/get_decs_ebay',
+        /* Куда пойдет запрос */
+        method: 'post',
+        /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
+        data: {
+            text: products_urls[current_product]
+        },
+        /* Параметры передаваемые в запросе. */
+        success: function (data) {
+            tts(text=data,speaker='None',previous_state='SEARCHING_PRODUCTS')
+        }
+    });
     }
   }
 }
