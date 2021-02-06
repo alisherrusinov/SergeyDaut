@@ -25,8 +25,7 @@ SECRET_KEY = 'cdkm_5r71w6zg-unsm=ltcq8=*)ppv9)f)b_9&f5!&hgjc1y1-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["yzbekindustries.pythonanywhere.com", "127.0.0.1", "pythonfordumbs.oa.r.appspot.com", "alexasuck.herokuapp.com"]
-
+ALLOWED_HOSTS = ["www.smart-speaker.co.uk","yzbekindustries.pythonanywhere.com", "127.0.0.1", "pythonfordumbs.oa.r.appspot.com", "alexasuck.herokuapp.com"]
 
 # Application definition
 
@@ -108,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Yekaterinburg'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 
@@ -122,6 +121,9 @@ USE_TZ = True
  
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'index', 'static'),
+        )
 PHRASES_ROOT = os.path.join(BASE_DIR, 'phrases')
 MEDIA_ROOT = os.path.join(BASE_DIR,'sounds', 'media')
 MUSIC_FILES = os.path.join(BASE_DIR, 'sounds', 'media', 'music')
