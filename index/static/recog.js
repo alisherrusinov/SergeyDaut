@@ -21,7 +21,9 @@ recognition.lang = 'en-US';
 
 ACTIVATION_PHASES = ['system', 'assistant']
 
-STOP_PHRASES = ['stop']
+STOP_PHRASES = ['stop', 'shut up', 'shut down']
+
+CONTINUE_PHRASES = ['resume', 'Resume', 'continue', 'Continue', 'go on', 'Go on']
 
 CURRENT_STATE = 'IDLE' // PLAYING_NEWS PLAYING_MUSIC 
 
@@ -42,15 +44,31 @@ recognition.onresult = function (event) {
     else if (contains(text, STOP_PHRASES) == 'ok') {
       if (CURRENT_STATE == 'PLAYING_NEWS') {
         document.getElementById('news-speaker').pause()
+        PREVIOUS_STATE = 'PLAYING_NEWS'
         CURRENT_STATE = 'IDLE'
       }
       else if (CURRENT_STATE == 'PLAYING_MUSIC') {
         document.getElementById('music-speaker').pause()
+        PREVIOUS_STATE = 'PLAYING_MUSIC'
         CURRENT_STATE = 'IDLE'
       }
       else if (CURRENT_STATE == 'SPEAKING') {
         document.getElementById('speaker').pause()
         CURRENT_STATE = PREVIOUS_STATE
+      }
+    }
+    else if (contains(text, CONTINUE_PHRASES) == 'ok') {
+      if (PREVIOUS_STATE == 'PLAYING_NEWS') {
+        document.getElementById('news-speaker').play()
+        CURRENT_STATE = 'PLAYING_NEWS'
+      }
+      else if (PREVIOUS_STATE == 'PLAYING_MUSIC') {
+        document.getElementById('music-speaker').play()
+        CURRENT_STATE = 'PLAYING_MUSIC'
+      }
+      else if (PREVIOUS_STATE == 'SPEAKING') {
+        document.getElementById('speaker').pause()
+        CURRENT_STATE = 'SPEAKING'
       }
     }
     else if (contains(text, NEXT_PRODUCT_VARIANTS) == 'ok') {
@@ -378,6 +396,7 @@ function work(text) {
     }
     else if (contains(text, MUSIC_PLAY_VARIANTS) == 'ok') {
       text = text.replace('play ', "")
+      tts('wait a minute')
       $.ajax({
         url: '/play_music',
         /* Куда пойдет запрос */
