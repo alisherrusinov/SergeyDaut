@@ -492,7 +492,7 @@ function work(text) {
       SHOPPING_CART.forEach(function (item, i, SHOPPING_CART) {
         var ul = document.getElementById("shopping-card");
       var li = document.createElement("li");
-      li.innerHTML = `<a href="${item[0]}">${item[1]}</a>`
+      li.innerHTML = `<a target='_blank' href="${item[0]}">${item[1]}</a>`
       ul.appendChild(li);
       });
     }
