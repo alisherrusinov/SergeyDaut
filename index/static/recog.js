@@ -47,47 +47,53 @@ recognition.onresult = function (event) {
         document.getElementById('music-speaker').pause()
         CURRENT_STATE = 'IDLE'
       }
-      else if(CURRENT_STATE == 'SPEAKING'){
+      else if (CURRENT_STATE == 'SPEAKING') {
         document.getElementById('speaker').pause()
         CURRENT_STATE = PREVIOUS_STATE
       }
     }
-    else if(contains(text, NEXT_PRODUCT_VARIANTS) == 'ok'){
-      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+    else if (contains(text, NEXT_PRODUCT_VARIANTS) == 'ok') {
+      if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
         // READ THE NEXT ONE
-        current_product+=1
-        tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
+        current_product += 1
+        tts(text = products[current_product], speaker = 'None', previous_state = 'SEARCHING_PRODUCTS');
         console.log(products_urls[current_product])
       }
     }
-    else if(contains(text, PREV_PRODUCT_VARIANTS) == 'ok'){
-      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+    else if (contains(text, PREV_PRODUCT_VARIANTS) == 'ok') {
+      if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
         // READ THE PREV ONE
-        if(current_product == 0){
-          tts(text="it's the first product",speaker='None' ,previous_state='SEARCHING_PRODUCTS')
+        if (current_product == 0) {
+          tts(text = "it's the first product", speaker = 'None', previous_state = 'SEARCHING_PRODUCTS')
         }
-        else{
-        current_product-=1
-        tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
-        console.log(products_urls[current_product])
+        else {
+          current_product -= 1
+          tts(text = products[current_product], speaker = 'None', previous_state = 'SEARCHING_PRODUCTS');
+          console.log(products_urls[current_product])
         }
       }
     }
-    else if(contains(text, DESCRIPTION_VARIANTS) == 'ok'){
-      if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
+    else if (contains(text, DESCRIPTION_VARIANTS) == 'ok') {
+      if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
         $.ajax({
           url: '/get_decs_ebay',
           /* Куда пойдет запрос */
           method: 'post',
           /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
           data: {
-              text: products_urls[current_product]
+            text: products_urls[current_product]
           },
           /* Параметры передаваемые в запросе. */
           success: function (data) {
-              tts(text=data,speaker='None' ,previous_state='SEARCHING_PRODUCTS')
+            tts(text = data, speaker = 'None', previous_state = 'SEARCHING_PRODUCTS')
           }
-      });
+        });
+      }
+    }
+    else if (contains(text, ADDING_TO_BASKET_VARIANTS) == 'ok') {
+      if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
+        SHOPPING_CART.push(products[current_product])
+        console.log(SHOPPING_CART)
       }
     }
 
@@ -175,23 +181,23 @@ function delete_temp_tts(name) {
 }
 
 
-TIME_VARIANTS = ['time is it now', 'time is now', 'what is the time now']
+TIME_VARIANTS = ['time is it now', 'time is now', 'what is the time now', 'time is it', 'time it is', 'tell me the time', 'do you have the time', 'have you got the time']
 
-DAY_OF_THE_WEEK_VARIANTS = ['day of the week',]
+DAY_OF_THE_WEEK_VARIANTS = ['day of the week', 'day is it', 'day is it now', 'day is it today']
 
-DATE_VARIANTS = ['what date is it today']
+DATE_VARIANTS = ['what date is it today', 'what date is it', "what's the date"]
 
-WEATHER_TEMPERATURE_VARIANTS = ["what's the temperature in",]
+WEATHER_TEMPERATURE_VARIANTS = ["what's the temperature in", 'what is the temperature', 'what, in degrees, is it', 'how many degrees', 'you know the temperature']
 
 WEATHER_VARIANTS = ["what's the weather in", "what is the weather like in", "what is the weather in"]
 
-NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'read the news for me']
+NEWS_VARIANTS = ["what's going on in the world", 'show me the latest news', 'read the news for me', 'what do they write about in newspapers', "what's in the newspapers", "what's been in the newspapers", "news"]
 
 TIMER_VARIANTS = ['set timer for',]
 
 CHANGE_TIMER_VARIANTS = ['change timer time to']
 
-CANCEL_TIMER_VARIANTS = ['remove timer']
+CANCEL_TIMER_VARIANTS = ['remove timer', 'cancel timer', 'delete timer']
 
 ALARM_VARIANTS = ['set alarm for', 'set  alarm at']
 
@@ -201,13 +207,17 @@ MUSIC_PLAY_VARIANTS = ['play ']
 
 EBAY_SEARCHING_VARIANTS = ['ebay']
 
-NEXT_PRODUCT_VARIANTS = ['next']
+NEXT_PRODUCT_VARIANTS = ['next', 'move to the next one', 'move on']
 
-PREV_PRODUCT_VARIANTS = ['go back']
+PREV_PRODUCT_VARIANTS = ['go back', 'read the last one', 'read the previous one']
 
 EXIT_EBAY_VARIANTS = ['exit from ebay']
 
 DESCRIPTION_VARIANTS = ['description', 'read the description']
+
+ADDING_TO_BASKET_VARIANTS = ['add to basket']
+
+SHOW_BASKET_VARIANTS = ['show my shopping cart', 'my shopping cart', 'show my basket']
 
 
 // Переменные которые нужны в глобальной видимости
@@ -218,6 +228,8 @@ products_urls = []
 products_prices = []
 current_product = 0
 
+SHOPPING_CART = []
+
 function work(text) {
   if (CURRENT_STATE == 'IDLE') {
     if (contains(text, TIME_VARIANTS) == 'ok') {
@@ -226,7 +238,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data.data,speaker='None' ,previous_state='IDLE')
+          tts(text = data.data, speaker = 'None', previous_state = 'IDLE')
         }
       })
     } else if (contains(text, DAY_OF_THE_WEEK_VARIANTS) == 'ok') {
@@ -235,7 +247,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data.data,speaker='None' ,previous_state='IDLE')
+          tts(text = data.data, speaker = 'None', previous_state = 'IDLE')
         }
       })
     }
@@ -245,7 +257,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data,speaker='None' ,previous_state='IDLE')
+          tts(text = data, speaker = 'None', previous_state = 'IDLE')
         }
       })
     }
@@ -258,7 +270,7 @@ function work(text) {
         },
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data.data,speaker='None' ,previous_state='IDLE')
+          tts(text = data.data, speaker = 'None', previous_state = 'IDLE')
         }
       })
     }
@@ -271,7 +283,7 @@ function work(text) {
         },
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data.data,speaker='None' ,previous_state='IDLE')
+          tts(text = data.data, speaker = 'None', previous_state = 'IDLE')
         }
       })
     }
@@ -281,7 +293,7 @@ function work(text) {
         method: 'get',
         success: function (data) {
           /* функция которая будет выполнена после успешного запроса.  */
-          tts(text=data.data, speaker = 'News',previous_state='IDLE')
+          tts(text = data.data, speaker = 'News', previous_state = 'IDLE')
         }
       })
     }
@@ -356,10 +368,10 @@ function work(text) {
       try {
         clearTimeout(timer)
         timer = null
-        tts(text='Removed timer',speaker='None' ,previous_state='IDLE')
+        tts(text = 'Removed timer', speaker = 'None', previous_state = 'IDLE')
       }
       catch (e) {
-        tts(text='There is no timers',speaker='None' ,previous_state='IDLE')
+        tts(text = 'There is no timers', speaker = 'None', previous_state = 'IDLE')
       }
     }
     else if (contains(text, MUSIC_PLAY_VARIANTS) == 'ok') {
@@ -383,7 +395,7 @@ function work(text) {
       });
     }
     else if (contains(text, NOTIFICATION_ADDING_VARIANTS) == 'ok') {
-      tts(text='tell me what should I remind',speaker='None' ,previous_state='ADDING_NOTIFICATION')
+      tts(text = 'tell me what should I remind', speaker = 'None', previous_state = 'ADDING_NOTIFICATION')
       CURRENT_STATE = 'ADDING_NOTIFICATION'
       start_custom_listen();
     }
@@ -408,17 +420,20 @@ function work(text) {
           products_prices = data.prices
           console.log(products[current_product])
           СURRENT_STATE = 'SEARCHING_PRODUCTS'
-          tts(text=products[current_product], speaker='None', previous_state='SEARCHING_PRODUCTS');
+          tts(text = products[current_product], speaker = 'None', previous_state = 'SEARCHING_PRODUCTS');
           console.log(products_urls[current_product])
         }
       });
 
     }
-    
+    else if (contains(text, SHOW_BASKET_VARIANTS) == 'ok') {
+      console.log(SHOPPING_CART)
+    }
+
   }
   else if (CURRENT_STATE == 'ADDING_NOTIFICATION') {
     notification_label = text
-    tts(text='tell me when should I remind',speaker='None',previous_state='ADDING_DATE_NOTIFICATION')
+    tts(text = 'tell me when should I remind', speaker = 'None', previous_state = 'ADDING_DATE_NOTIFICATION')
     CURRENT_STATE = 'ADDING_DATE_NOTIFICATION'
     start_custom_listen()
   }
@@ -436,7 +451,7 @@ function work(text) {
       /* Параметры передаваемые в запросе. */
       success: function (data) {
         timer = setTimeout(function () {
-          tts(text=notification_label,speaker='None' ,previous_state='IDLE')
+          tts(text = notification_label, speaker = 'None', previous_state = 'IDLE')
           notification_date = ''
           notification_label = ''
         }, data * 1000);
@@ -446,25 +461,32 @@ function work(text) {
     console.log(notification_date, notification_label)
     CURRENT_STATE = 'IDLE'
   }
-  else if(CURRENT_STATE == 'SEARCHING_PRODUCTS'){
-    if(contains(text, EXIT_EBAY_VARIANTS) == 'ok'){
+  else if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
+    if (contains(text, EXIT_EBAY_VARIANTS) == 'ok') {
       CURRENT_STATE = 'IDLE'
-      tts(text='Ok',speaker='None' ,previous_state='IDLE')
+      tts(text = 'Ok', speaker = 'None', previous_state = 'IDLE')
     }
-    else if(contains(text, DESCRIPTION_VARIANTS) == 'ok'){
+    else if (contains(text, DESCRIPTION_VARIANTS) == 'ok') {
       $.ajax({
         url: '/get_decs_ebay',
         /* Куда пойдет запрос */
         method: 'post',
         /* Метод передачи (post или get) */ /* Тип данных в ответе (xml, json, script, html). */
         data: {
-            text: products_urls[current_product]
+          text: products_urls[current_product]
         },
         /* Параметры передаваемые в запросе. */
         success: function (data) {
-            tts(text=data,speaker='None',previous_state='SEARCHING_PRODUCTS')
+          tts(text = data, speaker = 'None', previous_state = 'SEARCHING_PRODUCTS')
         }
-    });
+      });
+    }
+    else if (contains(text, ADDING_TO_BASKET_VARIANTS) == 'ok') {
+      SHOPPING_CART.push(products_urls[current_product])
+      console.log(SHOPPING_CART)
+    }
+    else if (contains(text, SHOW_BASKET_VARIANTS) == 'ok') {
+      console.log(SHOPPING_CART)
     }
   }
 }
