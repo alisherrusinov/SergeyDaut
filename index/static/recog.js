@@ -111,7 +111,7 @@ recognition.onresult = function (event) {
     }
     else if (contains(text, ADDING_TO_BASKET_VARIANTS) == 'ok') {
       if (CURRENT_STATE == 'SEARCHING_PRODUCTS') {
-        SHOPPING_CART.push(products[current_product])
+        SHOPPING_CART.push([products_urls[current_product], products[current_product]])
         console.log(SHOPPING_CART)
       }
     }
