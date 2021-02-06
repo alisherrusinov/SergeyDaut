@@ -32,6 +32,7 @@ recognition.onresult = function (event) {
   var result = event.results[event.resultIndex];
   if (result.isFinal) {
     console.log('Вы сказали: ' + result[0].transcript);
+    document.getElementsByName('text-preview')[0].placeholder = result[0].transcript
     text = result[0].transcript
     text = text.toLowerCase()
     if (contains(text, ACTIVATION_PHASES) == 'ok') {
@@ -153,6 +154,7 @@ async function sendVoice(form) {
     let response = await promise.text();
     text = response
     console.log(text.toLowerCase())
+    document.getElementsByName('text-preview')[0].placeholder = text.toLowerCase()
     work(text.toLowerCase())
   }
 
@@ -482,11 +484,17 @@ function work(text) {
       });
     }
     else if (contains(text, ADDING_TO_BASKET_VARIANTS) == 'ok') {
-      SHOPPING_CART.push(products_urls[current_product])
+      SHOPPING_CART.push([products_urls[current_product], products[current_product]])
       console.log(SHOPPING_CART)
     }
     else if (contains(text, SHOW_BASKET_VARIANTS) == 'ok') {
       console.log(SHOPPING_CART)
+      SHOPPING_CART.forEach(function (item, i, SHOPPING_CART) {
+        var ul = document.getElementById("shopping-card");
+      var li = document.createElement("li");
+      li.innerHTML = `<a href="${item[0]}">${item[1]}</a>`
+      ul.appendChild(li);
+      });
     }
   }
 }
